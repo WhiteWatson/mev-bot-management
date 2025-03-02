@@ -1,0 +1,20 @@
+all:
+  children:
+    mev_servers:
+      hosts:
+        server01:
+          ansible_host: 45.58.xxx.xxx # bot机器主ip
+          ip_addrs:
+            # ...该服务器所有IP
+          min_profit_threshold: 5000  # 利润阈值
+          # 每台机器不同参数都可以写到下面
+        server02:
+          ansible_host: # bot机器主ip
+          ip_addrs:
+            # ...
+        server03:
+          ansible_host: # bot机器主ip
+          memo: "nl_shark_3"
+          ip_addrs:
+            # ...
+        # 更多bot服务器信息

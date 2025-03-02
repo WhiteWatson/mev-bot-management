@@ -1,0 +1,5 @@
+# 
+service_user: mev-user
+install_path: /opt/mev-bot
+config_path: /etc/mev-bot
+binary_name: rust-mev-bot-shared

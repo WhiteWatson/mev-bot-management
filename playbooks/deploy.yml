@@ -1,0 +1,106 @@
+- name: Deploy MEV Bot
+  hosts: mev_servers
+  become: yes
+  vars:
+    app_dir: /root/auto-bot
+    encrypted_key: "{{ playbook_dir }}/privatekey/PRIVATEKEY"
+
+  tasks:
+    # 创建运行目录
+    - name: create bot dir
+      file:
+        path: /root/auto-bot
+        state: directory
+
+    # 安装依赖
+    - name: install OS module
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - wget
+        - unzip
+        - screen
+
+    # 下载发布版本
+    - name: download rust-mev-bot.zip
+      become_user: root
+      shell:
+        cmd: "wget -q -O /root/auto-bot/rust-mev-bot.zip https://sourceforge.net/projects/rust-mev-bot/files/rust-mev-bot-1.0.6.zip"
+        chdir: /root/auto-bot
+        creates: /root/auto-bot/rust-mev-bot.zip  # 避免重复下载
+
+    # 解压文件
+    - name: unzip rust-mev-bot.zip
+      unarchive:
+        src: /root/auto-bot/rust-mev-bot.zip
+        dest: /root/auto-bot
+        remote_src: yes
+        owner: root
+        group: root
+
+    # 生成配置文件
+    - name: moban peizhi general
+      template:
+        src: config.yaml.j2
+        dest: /root/auto-bot/config.yaml
+        owner: root
+        group: root
+        mode: 0644
+        
+     # 安全传输加密私钥（新增任务）
+    - name: 传输加密私钥文件
+      copy:
+        src: "{{ encrypted_key }}"
+        dest: "{{ app_dir }}/PRIVATEKEY"
+        owner: root
+        group: root
+        mode: 0600
+      no_log: true  # 禁止输出传输日志
+
+    # 设置执行权限
+    - name: chmod sh 0755
+      file:
+        path: "{{ item }}"
+        mode: 0755
+      loop:
+        - /root/auto-bot/run.sh
+        - /root/auto-bot/upgrade.sh
+
+    # 更新版本
+    - name: upgrade sh
+      shell:
+        cmd: ./upgrade.sh
+        chdir: /root/auto-bot
+        
+    # 清理旧会话
+    - name: clear auto-bot screen
+      shell: |
+        screen -ls | grep "auto-bot" | awk '{print $1}' | xargs -I {} screen -S {} -X quit
+      args:
+        executable: /bin/bash
+      register: kill_screen
+      become: yes
+      ignore_errors: yes
+
+    # 通过screen启动服务
+    - name: run server in screen
+      shell: |
+        /usr/bin/screen -dmS auto-bot
+        /usr/bin/screen -S auto-bot -X stuff "cd /root/auto-bot && ./run.sh\n"
+      args:
+        executable: /bin/bash
+      register: screen_start
+      changed_when: "'auto-bot' not in screen_start.stdout"
+
+    # 验证服务状态
+    - name: -- check screen --
+      shell: screen -ls | grep auto-bot
+      register: screen_status
+      changed_when: false
+
+    - name: show screen status
+      debug:
+        msg: "服务已在screen会话 [auto-bot] 中运行"
+      when: "'auto-bot' in screen_status.stdout"
