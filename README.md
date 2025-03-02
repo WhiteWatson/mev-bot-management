@@ -2,7 +2,7 @@
 
 ## 简介
 
-这是一个用于批量运维服务器的自动化脚本，主要用于部署和管理 MEV Bot。
+这是一个用于批量运维服务器的自动化脚本，主要用于部署和管理 Rust MEV Bot https://github.com/SaoXuan/rust-mev-bot-shared。
 
 ## 使用说明
 
@@ -39,3 +39,7 @@ Ansible 会根据编排自动下载安装 bot 机器人，并且在名为 auto-b
 ```sh
 ansible-playbook -i hosts.yml --private-key ~/.ssh/mev-bot-key playbooks/deploy.yml
 ```
+
+![alt text](./docs/image.png)
+
+- [Discord 群聊，欢迎进来和大佬们一起搞钱](https://discord.gg/rCBZy4ZKZD)
