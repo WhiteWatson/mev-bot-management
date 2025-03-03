@@ -2,7 +2,7 @@
 
 ## 简介
 
-这是一个用于批量运维服务器的自动化脚本，主要用于部署和管理 Rust MEV Bot https://github.com/SaoXuan/rust-mev-bot-shared。
+这是一个用于批量运维服务器的自动化脚本，主要用于部署和管理 Rust MEV Bot https://github.com/SaoXuan/rust-mev-bot-shared
 
 ## 使用说明
 
