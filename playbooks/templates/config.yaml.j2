@@ -58,7 +58,7 @@ min_profit_threshold: {{ min_profit_threshold | default(5000) }}
 max_tip_lamports: 100000000
 static_tip_percentage: 0.7001
 #交易memo
-memo: "{{ memo }}"
+memo: "{{ memo | default(auto-bot) }}"
 #交易金额范围
 trade_range:
   - 100000000 # 0.1 SOL
