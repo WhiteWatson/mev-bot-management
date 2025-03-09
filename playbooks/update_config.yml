@@ -1,0 +1,15 @@
+- name: Update MEV Bot Config
+  hosts: mev_servers
+  become: yes
+  vars:
+    app_dir: /root/auto-bot
+
+  tasks:
+    # 生成配置文件
+    - name: moban peizhi general
+      template:
+        src: config.yaml.j2
+        dest: /root/auto-bot/config.yaml
+        owner: root
+        group: root
+        mode: 0644

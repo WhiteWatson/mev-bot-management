@@ -1,0 +1,39 @@
+- name: Restart MEV Bot Service
+  hosts: mev_servers
+  become: yes
+  vars:
+    app_dir: /root/auto-bot
+
+  tasks:
+    # 清理所有存在的auto-bot screen会话
+    - name: Terminate existing bot sessions
+      shell: |
+        screen -ls | grep "auto-bot" | awk '{print $1}' | xargs -I {} screen -S {} -X quit
+      args:
+        executable: /bin/bash
+      ignore_errors: yes
+      register: session_cleanup
+
+    # 确保脚本可执行
+    - name: Set executable permissions for run.sh
+      file:
+        path: "{{ app_dir }}/run.sh"
+        mode: 0755
+
+    # 通过screen启动新服务
+    - name: Launch bot in screen session
+      shell: |
+        screen -dmS auto-bot bash -c "cd {{ app_dir }} && ./run.sh"
+      args:
+        executable: /bin/bash
+
+    # 服务状态验证
+    - name: Verify screen session
+      shell: screen -ls | grep auto-bot
+      register: session_status
+      changed_when: false
+
+    - name: Display restart status
+      debug:
+        msg: "✅ Bot已在screen会话 [auto-bot] 中成功重启"
+      when: "'auto-bot' in session_status.stdout"
