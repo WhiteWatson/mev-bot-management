@@ -54,7 +54,7 @@ not_support_tokens: []
 #最大代币数量
 max_tokens_limit: 100
 #最小利润阈值
-min_profit_threshold: {{ min_profit_threshold | default(5000) }}
+min_profit_threshold: {{ min_profit_threshold | default(3000) }}
 max_tip_lamports: 100000000
 static_tip_percentage: 0.7001
 #交易memo

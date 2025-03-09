@@ -1,0 +1,8 @@
+# 忽略根目录下的 .yml 文件，防止把自己的机器信息上传
+*.yml
+
+# 忽略 /playbook/privatekey/ 目录下的 PRIVATEKEY 文件，防止私钥被上传
+/playbook/privatekey/PRIVATEKEY
+
+# 忽略 /playbook/templates/ 目录下的 .j2 文件 防止配置信息泄露
+/playbook/templates/*.j2
