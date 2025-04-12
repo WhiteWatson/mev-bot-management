@@ -4,20 +4,12 @@ all:
       hosts:
         server01:
           ansible_host: 45.58.xxx.xxx # bot机器主ip
-          ip_addrs:
-            # ...该服务器所有IP
-            - "45.58.xxx.xx1"
-            - "45.58.xxx.xx2"
           memo: "备注-机器1" # 备注
           min_profit_threshold: 5000  # 利润阈值
           # 每台机器不同参数都可以写到下面，需要跟config.yml.j2文件中模板变量一致
         server02:
           ansible_host: # bot机器主ip
-          ip_addrs:
-            # ...
         server03:
           ansible_host: # bot机器主ip
           memo: "nl_shark_3"
-          ip_addrs:
-            # ...
         # 更多bot服务器信息
