@@ -64,7 +64,7 @@ max_tip_lamports: 100000000
 #静态tip百分比，给jito的tip百分比
 static_tip_percentage: 0.7501
 #交易memo，可以不设置
-memo: "{{ memo | default(auto-bot) }}"
+memo: "{{ memo }}"
 #建议先从小的开始0.1-1s，不要设置太多，影响性能
 #trade_range:
 #  - 0.1
