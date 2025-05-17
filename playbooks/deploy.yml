@@ -21,13 +21,15 @@
       loop:
         - wget
         - unzip
-        - screen
+        - tmux
+        - iputils-ping
+        - net-tools
 
     # 下载发布版本
     - name: download rust-mev-bot.zip
       become_user: root
       shell:
-        cmd: "wget -q -O /root/auto-bot/rust-mev-bot.zip https://sourceforge.net/projects/rust-mev-bot/files/rust-mev-bot-1.0.10.zip"
+        cmd: "wget -q -O /root/auto-bot/rust-mev-bot.zip https://sourceforge.net/projects/rust-mev-bot/files/rust-mev-bot-1.0.17.zip"
         chdir: /root/auto-bot
         creates: /root/auto-bot/rust-mev-bot.zip # 避免重复下载
 
@@ -75,32 +77,32 @@
         chdir: /root/auto-bot
 
     # 清理旧会话
-    - name: clear auto-bot screen
+    - name: clear auto-bot tmux
       shell: |
-        screen -ls | grep "auto-bot" | awk '{print $1}' | xargs -I {} screen -S {} -X quit
+        tmux ls | grep auto-bot | cut -d: -f1 | xargs -r -I {} tmux kill-session -t {}
       args:
         executable: /bin/bash
-      register: kill_screen
+      register: kill_tmux
       become: yes
       ignore_errors: yes
 
-    # 通过screen启动服务
-    - name: run server in screen
+    # 通过tmux启动服务
+    - name: run server in tmux
       shell: |
-        /usr/bin/screen -dmS auto-bot
-        /usr/bin/screen -S auto-bot -X stuff "cd /root/auto-bot && ./run.sh\n"
+        /usr/bin/tmux new-session -d -s auto-bot
+        /usr/bin/tmux send-keys -t auto-bot "cd /root/auto-bot && ./run.sh" C-m
       args:
         executable: /bin/bash
-      register: screen_start
-      changed_when: "'auto-bot' not in screen_start.stdout"
+      register: tmux_start
+      changed_when: "'auto-bot' not in tmux_start.stdout"
 
     # 验证服务状态
-    - name: -- check screen --
-      shell: screen -ls | grep auto-bot
-      register: screen_status
+    - name: -- check tmux --
+      shell: tmux ls | grep auto-bot
+      register: tmux_status
       changed_when: false
 
-    - name: show screen status
+    - name: show tmux status
       debug:
-        msg: "服务已在screen会话 [auto-bot] 中运行"
-      when: "'auto-bot' in screen_status.stdout"
+        msg: "服务已在tmux会话 [auto-bot] 中运行"
+      when: "'auto-bot' in tmux_status.stdout"
