@@ -5,10 +5,10 @@
     app_dir: /root/auto-bot
 
   tasks:
-    # 清理所有存在的auto-bot screen会话
+    # 清理所有存在的auto-bot tmux会话
     - name: Terminate existing bot sessions
       shell: |
-        screen -ls | grep "auto-bot" | awk '{print $1}' | xargs -I {} screen -S {} -X quit
+        tmux ls | grep auto-bot | cut -d: -f1 | xargs -r -I {} tmux kill-session -t {}
       args:
         executable: /bin/bash
       ignore_errors: yes
@@ -20,20 +20,21 @@
         path: "{{ app_dir }}/run.sh"
         mode: 0755
 
-    # 通过screen启动新服务
-    - name: Launch bot in screen session
+    # 通过tmux启动新服务
+    - name: Launch bot in tmux session
       shell: |
-        screen -dmS auto-bot bash -c "cd {{ app_dir }} && ./run.sh"
+        /usr/bin/tmux new-session -d -s auto-bot
+        /usr/bin/tmux send-keys -t auto-bot "cd /root/auto-bot && ./run.sh" C-m
       args:
         executable: /bin/bash
 
     # 服务状态验证
-    - name: Verify screen session
-      shell: screen -ls | grep auto-bot
+    - name: Verify tmux session
+      shell: tmux ls | grep auto-bot
       register: session_status
       changed_when: false
 
     - name: Display restart status
       debug:
-        msg: "✅ Bot已在screen会话 [auto-bot] 中成功重启"
+        msg: "✅ Bot已在tmux会话 [auto-bot] 中成功重启"
       when: "'auto-bot' in session_status.stdout"

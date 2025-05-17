@@ -1,0 +1,15 @@
+- name: Restart MEV Bot Service
+  hosts: mev_servers
+  become: yes
+  vars:
+    app_dir: /root/auto-bot
+
+  tasks:
+    - name: Reboot
+      shell: |
+        shutdown -r now
+      args:
+        executable: /bin/bash
+      ignore_errors: yes
+      register: session_reboot
+
